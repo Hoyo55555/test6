@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國文總複習大挑戰 | L7-L10 & 自學選文</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50; /* 深藍灰 */
+            --accent-color: #e67e22; /* 活力橘 */
+            --bg-color: #ecf0f1;     /* 淺灰底 */
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --correct-color: #27ae60;
+            --wrong-color: #c0392b;
+            --font-main: 'Noto Sans TC', sans-serif;
+            --font-serif: 'Noto Serif TC', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(#bdc3c7 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Container */
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            min-height: 600px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .progress-indicator {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Intro View */
+        .intro-view {
+            text-align: center;
+        }
+
+        .intro-title {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .intro-desc {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .tags {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #f0f2f5;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+
+        /* Quiz View */
+        .quiz-view {
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            color: var(--primary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            color: var(--text-color);
+            font-family: var(--font-main);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            background: #f9f9f9;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .option-btn.correct {
+            border-color: var(--correct-color);
+            background-color: #d5f5e3;
+            color: #145a32;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--wrong-color);
+            background-color: #fadbd8;
+            color: #7b241c;
+            opacity: 0.7;
+        }
+
+        .option-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        /* Explanation Box */
+        .explanation-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #fdfefe;
+            border-left: 5px solid var(--accent-color);
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .exp-title {
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Result View */
+        .result-view {
+            text-align: center;
+            align-items: center;
+        }
+
+        .score-display {
+            font-size: 6rem;
+            font-weight: 900;
+            font-family: var(--font-serif);
+            color: var(--accent-color);
+            margin: 20px 0;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .result-msg {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .result-sub {
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+
+        /* Buttons */
+        .primary-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(230, 126, 34, 0.6);
+            background-color: #d35400;
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            align-self: flex-end;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .app-container {
+                border-radius: 0;
+                margin: 0;
+                height: 100vh;
+            }
+            .intro-title { font-size: 2rem; }
+            .content-area { padding: 25px; }
+            .question-text { font-size: 1.1rem; }
+            .option-btn { padding: 15px; font-size: 1rem; }
+            header { padding: 10px 20px; }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.8rem;
+            color: #95a5a6;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo"><i class="fa-solid fa-scroll"></i> 國文大挑戰</div>
+        <div class="progress-indicator" id="progress-text">準備開始</div>
+    </header>
+    
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- 1. Intro Screen -->
+    <div class="content-area intro-view" id="intro-screen">
+        <h1 class="intro-title">國文段考總複習</h1>
+        <div class="tags">
+            <span class="tag">#兒時記趣</span>
+            <span class="tag">#朋友相交</span>
+            <span class="tag">#音樂家與職籃巨星</span>
+            <span class="tag">#玫瑰淚</span>
+            <span class="tag">#自學選文</span>
+        </div>
+        <p class="intro-desc">
+            這是一份為你準備的考前總複習遊戲。<br>
+            包含形音義、修辭、成語與課文文意理解。<br>
+            準備好挑戰這 35 道題目了嗎？
+        </p>
+        <button class="primary-btn" onclick="startGame()">
+            開始挑戰 <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- 2. Quiz Screen -->
+    <div class="content-area quiz-view hidden" id="quiz-screen">
+        <div class="question-text" id="question-text">
+            題目載入中...
+        </div>
+        <div class="options-grid" id="options-container">
+            <!-- Options will be injected here -->
+        </div>
+        
+        <div class="explanation-box hidden" id="explanation-box">
+            <div class="exp-title"><i class="fa-regular fa-lightbulb"></i> 解析</div>
+            <div id="explanation-text"></div>
+        </div>
+
+        <button class="primary-btn next-btn hidden" id="next-btn" onclick="nextQuestion()">
+            下一題 <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- 3. Result Screen -->
+    <div class="content-area result-view hidden" id="result-screen">
+        <div class="result-msg" id="result-title">測驗結束</div>
+        <div class="score-display" id="final-score">0</div>
+        <div class="result-sub">總分 / 100</div>
+        <p class="intro-desc" id="result-feedback">
+            <!-- Feedback text -->
+        </p>
+        <button class="primary-btn" onclick="restartGame()">
+            <i class="fa-solid fa-rotate-right"></i> 重新挑戰
+        </button>
+    </div>
+
+    <footer>
+        Designed for Chinese Review | L7-L10
+    </footer>
+</div>
+
+<script>
+    // 題庫資料 (從之前的對話生成)
+    const questionsData = [
+    {
+      "question": "【L7 兒時記趣】在「明察秋毫」這句成語中，「秋毫」原本的意思是指什麼？",
+      "options": ["秋天的落葉", "秋天鳥獸新長出的細毛", "秋天微弱的風", "秋天清澈的露水"],
+      "answer": 1,
+      "hint": "「秋毫」本義為秋天鳥獸新長出的細毛，形容極其細微的事物。"
+    },
+    {
+      "question": "【L7 兒時記趣】作者將蚊子想像成「群鶴舞空」，並說「夏蚊成雷」，這運用了哪兩種修辭技巧？",
+      "options": ["譬喻、轉化", "譬喻、誇飾", "排比、映襯", "設問、感嘆"],
+      "answer": 1,
+      "hint": "將蚊子比作鶴是「譬喻」，將蚊鳴聲說成雷聲是「誇飾」。"
+    },
+    {
+      "question": "【L7 兒時記趣】文中提到「昂首觀之，項為之強」，句中的「強」字讀音與意思為何？",
+      "options": ["ㄑㄧㄤˊ，強壯", "ㄐㄧㄤˋ，固執", "ㄑㄧㄤˇ，勉強", "ㄐㄧㄤ，僵硬"],
+      "answer": 3,
+      "hint": "此處「強」通「僵」，音ㄐㄧㄤ，指脖子因為長時間抬頭而感到僵硬。"
+    },
+    {
+      "question": "【L7 兒時記趣】作者對於「癩蝦蟆」吃掉二蟲的反應是「鞭數十，驅之別院」，這顯示了作者當時具有什麼樣的心情？",
+      "options": ["欺善怕惡", "物外之趣", "見義勇為與同情弱小", "喜愛虐待動物"],
+      "answer": 2,
+      "hint": "作者同情被吃的昆蟲，懲罰破壞樂趣與殺生的癩蝦蟆，展現了童稚的正義感。"
+    },
+    {
+      "question": "【L7 兒時記趣】「忽有龐然大物，拔山倒樹而來」，句中的「龐然大物」在文中原本是指什麼？",
+      "options": ["大象", "癩蝦蟆", "大狼狗", "麻雀"],
+      "answer": 1,
+      "hint": "在作者蹲在草叢中的視角下，一隻普通的癩蝦蟆看起來就像巨大的怪獸。"
+    },
+    {
+      "question": "【L8 朋友相交】作者引用「君子之交淡如水」這句話，主要的用意是強調朋友相交應該如何？",
+      "options": ["感情平淡，不需要太常聯絡", "不涉及利害，情誼才能長久", "像水一樣無色無味，隨緣即可", "要像喝水一樣，每天都必須見面"],
+      "answer": 1,
+      "hint": "「淡」是指像水一樣純淨、沒有雜質（利益），這樣的情誼最為長久。"
+    },
+    {
+      "question": "【L8 朋友相交】下列哪一個成語的意思是「彼此心意契合，交誼深厚」，可用來形容知己？",
+      "options": ["點頭之交", "莫逆於心", "近在咫尺", "潛移默化"],
+      "answer": 1,
+      "hint": "莫逆於心指心中沒有違逆（分歧），形容情投意合，是極好的朋友。"
+    },
+    {
+      "question": "【L8 朋友相交】文中提到益友有三種：「友直、友諒、友多聞」。其中「友直」的意思是什麼？",
+      "options": ["結交講話很直接、傷人的朋友", "結交正直、能糾正自己過失的朋友", "結交直接給予金錢援助的朋友", "結交個性爽朗、不拘小節的朋友"],
+      "answer": 1,
+      "hint": "友直是指結交正直的朋友，他們能在你犯錯時直言規勸。"
+    },
+    {
+      "question": "【L8 朋友相交】關於作者對於「學生時代的朋友」的看法，下列敘述何者正確？",
+      "options": ["學生時代的朋友一定是最純真、最完美的", "只有出社會後交的朋友才禁得起考驗", "交朋友不分時期，重點在於人的「本質」", "學生時代的朋友通常充滿利害關係"],
+      "answer": 2,
+      "hint": "作者強調「問題在人的本質」，如果人好，哪個時期認識都好。"
+    },
+    {
+      "question": "【L8 朋友相交】文中「時空遙隔...有的情誼可以歷久而彌新」的「彌」字意思為何？",
+      "options": ["填補", "遍布", "更加", "終止"],
+      "answer": 2,
+      "hint": "「彌」新意指「更加」新，表示時間越久，感情反而越深厚。"
+    },
+    {
+      "question": "【L9 音樂家與職籃巨星】作者舉魯賓斯坦與麥可·喬丹為例，主要是為了論證哪一個觀點？",
+      "options": ["天分決定了一個人的成就上限", "成功需要天分，更需要勤奮不懈的苦練", "身體條件是運動員最大的障礙", "音樂家比運動員更需要長時間的練習"],
+      "answer": 1,
+      "hint": "這正是全文的主旨：即使有天分，或者天分一度被忽視，苦練都是成功的關鍵。"
+    },
+    {
+      "question": "【L9 音樂家與職籃巨星】喬丹在高中時曾被教練嫌棄，甚至只能參加二軍，主要原因是什麼？",
+      "options": ["球技不佳", "身材不夠高大", "練習不夠勤奮", "個性孤僻難相處"],
+      "answer": 1,
+      "hint": "文中提到他當時身高五呎八吋，被嫌太矮。"
+    },
+    {
+      "question": "【L9 音樂家與職籃巨星】「磨鍊，絕不是臨陣磨鎗、臨渴掘井。」這句話中的「臨渴掘井」意近於下列何者？",
+      "options": ["未雨綢繆", "平時燒香", "臨時抱佛腳", "亡羊補牢"],
+      "answer": 2,
+      "hint": "臨渴掘井比喻事到臨頭才想辦法，與「臨時抱佛腳」意思相近。"
+    },
+    {
+      "question": "【L9 音樂家與職籃巨星】文中提到「璞玉」是用來比喻什麼？",
+      "options": ["昂貴的寶石", "資質極差的人", "虛有其表的人", "資質好但未經琢磨的人"],
+      "answer": 3,
+      "hint": "璞玉指包著石頭的玉，比喻人有天分但還沒經過後天的努力琢磨。"
+    },
+    {
+      "question": "【L9 音樂家與職籃巨星】「心無旁鶩」的「鶩」字意思為何？",
+      "options": ["馬在奔跑", "野鴨", "大霧", "錯誤"],
+      "answer": 1,
+      "hint": "鶩（ㄨˋ）本義是野鴨。心無旁鶩比喻專心一意，心思沒有飛到旁邊的野鴨身上。"
+    },
+    {
+      "question": "【L10 玫瑰淚】故事中，小男孩為什麼堅持要買那個洋娃娃？",
+      "options": ["因為他自己很喜歡玩洋娃娃", "他要送給在醫院生病的媽媽", "他要請媽媽帶給去當天使的妹妹", "這是耶誕老公公指定的禮物"],
+      "answer": 2,
+      "hint": "妹妹已經去世，他希望即將去世的媽媽能把娃娃帶給妹妹。"
+    },
+    {
+      "question": "【L10 玫瑰淚】文中「白玫瑰」對小男孩的母親具有什麼特殊意義？",
+      "options": ["是她最喜歡的花", "是她結婚時的花束", "代表她對丈夫的愛", "代表著耶誕節的祝福"],
+      "answer": 0,
+      "hint": "男孩提到媽媽非常喜歡白玫瑰。"
+    },
+    {
+      "question": "【L10 玫瑰淚】主角在櫃檯前悄悄做了什麼舉動幫助小男孩？",
+      "options": ["幫他付清了所有款項", "把自己的錢混入男孩的錢中", "勸小男孩不要買太貴的娃娃", "買了另一個更貴的娃娃送他"],
+      "answer": 1,
+      "hint": "主角假裝錢是男孩自己的，顧全了男孩的自尊心。"
+    },
+    {
+      "question": "【L10 玫瑰淚】文中描述小男孩看著照片「喃喃自語」，意思是？",
+      "options": ["大聲地對眾人演說", "自己不斷地輕聲說話", "憤怒地罵人", "興奮地大叫"],
+      "answer": 1,
+      "hint": "喃喃自語形容低聲自言自語的樣子。"
+    },
+    {
+      "question": "【L10 玫瑰淚】故事最後，主角的生活「將會改變」，最可能的改變方向是什麼？",
+      "options": ["變得更節省，不再亂花錢", "變得更懂得付出愛與關懷", "決定以後不再去那家商店", "變得更討厭耶誕節"],
+      "answer": 1,
+      "hint": "經過這次事件，主角從原本的不耐煩轉變為充滿悲憫與愛心。"
+    },
+    {
+      "question": "【自學選文】「濫竽充數」這個成語的主角是誰？",
+      "options": ["齊宣王", "南郭處士", "齊湣王", "韓非"],
+      "answer": 1,
+      "hint": "南郭處士是不會吹竽卻混在樂隊裡的人。"
+    },
+    {
+      "question": "【自學選文】神話「夸父逐日」中，夸父死後的手杖化成了什麼？",
+      "options": ["高山", "河流", "桃林（鄧林）", "太陽"],
+      "answer": 2,
+      "hint": "棄其杖，化為鄧林（桃林），造福後人。"
+    },
+    {
+      "question": "【自學選文】在《貪睡的長頸鹿》一文中，作者認為「人生最可怕的是錯置」，意思是？",
+      "options": ["睡錯了位置", "搞不清楚自己的角色與能力", "買錯了東西", "去錯了地方旅遊"],
+      "answer": 1,
+      "hint": "作者認為沒有獅子的能力卻想過獅子的生活，認不清自己才是最可怕的。"
+    },
+    {
+      "question": "【自學選文】《行動的水滴才能匯流大河》一文中，萊恩的夢想是什麼？",
+      "options": ["成為職籃巨星", "在非洲挖一口井，讓人有乾淨的水喝", "買一個昂貴的玩具", "去非洲看長頸鹿"],
+      "answer": 1,
+      "hint": "萊恩為了讓非洲居民有乾淨的水喝而努力募款挖井。"
+    },
+    {
+      "question": "【自學選文】村上春樹說：「在高牆和撞向高牆的蛋之間，我永遠站在蛋這一邊。」這裡的「蛋」象徵什麼？",
+      "options": ["堅硬強大的勢力", "脆弱的弱勢者", "美味的食物", "圓滑的處世態度"],
+      "answer": 1,
+      "hint": "蛋易碎，象徵面對體制或強權的弱勢個體。"
+    },
+    {
+      "question": "【總複習】下列哪一個成語最適合用來形容《音樂家與職籃巨星》中，苦練後的喬丹？",
+      "options": ["濫竽充數", "脫穎而出", "臨渴掘井", "孤芳自賞"],
+      "answer": 1,
+      "hint": "形容顯露才能，超越眾人，符合喬丹經過苦練後的表現。"
+    },
+    {
+      "question": "【總複習】比較《兒時記趣》的沈復和《玫瑰淚》的小男孩，兩者有什麼共同點？",
+      "options": ["都很有錢", "都擁有豐富的想像力與情感", "都喜歡打籃球", "都很會彈鋼琴"],
+      "answer": 1,
+      "hint": "沈復將蚊子想像成鶴；小男孩將死亡想像成跟上帝在一起，並寄託深情。"
+    },
+    {
+      "question": "【總複習】下列關於「強」字的讀音與解釋，何者與《兒時記趣》中「項為之強」的「強」完全相同？",
+      "options": ["身「強」體壯（ㄑㄧㄤˊ）", "個性倔「強」（ㄐㄧㄤˋ）", "勉「強」（ㄑㄧㄤˇ）答應", "手腳「強」直（ㄐㄧㄤ）"],
+      "answer": 3,
+      "hint": "通「僵」，僵硬的意思，與「項為之強」相同。"
+    },
+    {
+      "question": "【總複習】《朋友相交》與《音樂家與職籃巨星》這兩課在寫作手法上有何相似之處？",
+      "options": ["都是純粹的記敘文", "都運用了「夾敘夾議」的手法", "都使用了倒敘法", "都是書信體"],
+      "answer": 1,
+      "hint": "兩者都結合敘事（講故事）與議論（說明道理）。"
+    },
+    {
+      "question": "【總複習】下列哪一句話最能貫穿《行動的水滴才能匯流大河》與《玫瑰淚》兩篇文章的精神？",
+      "options": ["一分耕耘，一分收穫", "愛要及時，並付諸行動", "物競天擇，適者生存", "想像力是超能力"],
+      "answer": 1,
+      "hint": "萊恩用行動去挖井；主角及時展現愛心幫助男孩。兩者都強調愛的實踐。"
+    },
+    {
+      "question": "【總複習】下列文句中「之」字的用法，何者是指「代詞」（代替人或物）？",
+      "options": ["心「之」所向（L7）", "物外「之」趣（L7）", "昂首觀「之」（L7）", "送孟浩然「之」廣陵（L8）"],
+      "answer": 2,
+      "hint": "昂首觀「之」，觀看「蚊子」。"
+    },
+    {
+      "question": "【總複習】如果南郭處士（濫竽充數主角）想要改變命運，他應該學習哪一課的精神？",
+      "options": ["兒時記趣：發揮想像力", "音樂家與職籃巨星：勤能補拙，苦練技藝", "貪睡的長頸鹿：認清自己是獅子", "朋友相交：結交會吹竽的朋友"],
+      "answer": 1,
+      "hint": "南郭的問題是沒有真才實學，苦練正是解方。"
+    },
+    {
+      "question": "【總複習】關於這幾課的主題，下列配對何者錯誤？",
+      "options": ["兒時記趣 ─ 觀察與想像", "朋友相交 ─ 誠信與品德", "玫瑰淚 ─ 戰爭與和平", "音樂家與職籃巨星 ─ 苦練與成功"],
+      "answer": 2,
+      "hint": "玫瑰淚的主題應為「愛與悲憫」。"
+    },
+    {
+        "question": "【L9 音樂家與職籃巨星】喬丹曾說：「我深信一分耕耘，一分收穫。」這句話的含義是什麼？",
+        "options": ["努力與成果成正比", "耕田很重要", "收穫要靠運氣", "比賽輸贏不重要"],
+        "answer": 0,
+        "hint": "強調努力付出就會有相對應的回報。"
+    },
+    {
+        "question": "【L8 朋友相交】文中提到「益者三友」，是指哪三種朋友？",
+        "options": ["友直、友諒、友多聞", "友便辟、友善柔、友便佞", "友富、友貴、友權", "友智、友仁、友勇"],
+        "answer": 0,
+        "hint": "論語中提到的三種好朋友。"
+    }
+    ];
+
+    // Game Variables
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+
+    // DOM Elements
+    const introScreen = document.getElementById('intro-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const explanationBox = document.getElementById('explanation-box');
+    const explanationText = document.getElementById('explanation-text');
+    const nextBtn = document.getElementById('next-btn');
+    
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    
+    const finalScoreDisplay = document.getElementById('final-score');
+    const resultFeedback = document.getElementById('result-feedback');
+
+    // Sounds (Simulated with simple logic, usually requires Audio files)
+    // We will just use visual cues for this lightweight version.
+
+    function initGame() {
+        currentQuestionIndex = 0;
+        score = 0;
+        progressBar.style.width = '0%';
+    }
+
+    function startGame() {
+        initGame();
+        introScreen.classList.add('hidden');
+        resultScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        const currentQ = questionsData[currentQuestionIndex];
+        
+        // Update UI Text
+        progressText.innerText = `題目 ${currentQuestionIndex + 1} / ${questionsData.length}`;
+        const progressPercent = ((currentQuestionIndex) / questionsData.length) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+
+        questionText.innerText = currentQ.question;
+        
+        // Reset Options and Explanation
+        optionsContainer.innerHTML = '';
+        explanationBox.classList.add('hidden');
+        nextBtn.classList.add('hidden');
+
+        // Generate Options
+        currentQ.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleAnswer(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selectedIndex, selectedBtn) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const currentQ = questionsData[currentQuestionIndex];
+        const allBtns = document.querySelectorAll('.option-btn');
+        const correctIndex = currentQ.answer;
+
+        // Visual Feedback
+        if (selectedIndex === correctIndex) {
+            score++;
+            selectedBtn.classList.add('correct');
+            selectedBtn.innerHTML += ' <i class="fa-solid fa-check option-icon"></i>';
+        } else {
+            selectedBtn.classList.add('wrong');
+            selectedBtn.innerHTML += ' <i class="fa-solid fa-xmark option-icon"></i>';
+            // Highlight correct answer
+            allBtns[correctIndex].classList.add('correct');
+            allBtns[correctIndex].innerHTML += ' <i class="fa-solid fa-check option-icon"></i>';
+        }
+
+        // Disable all buttons
+        allBtns.forEach(btn => btn.disabled = true);
+
+        // Show Explanation
+        explanationText.innerText = currentQ.hint;
+        explanationBox.classList.remove('hidden');
+        
+        // Show Next Button
+        nextBtn.classList.remove('hidden');
+        
+        // Update Progress Bar to current completed
+        const progressPercent = ((currentQuestionIndex + 1) / questionsData.length) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questionsData.length) {
+            // Fade out effect
+            quizScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadQuestion();
+                quizScreen.style.opacity = '1';
+            }, 300);
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        quizScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+        progressText.innerText = '測驗完成';
+        progressBar.style.width = '100%';
+
+        // Calculate Score (Simple percentage for now, normalized to 100)
+        const totalScore = Math.round((score / questionsData.length) * 100);
+        
+        // Animation for score
+        let tempScore = 0;
+        const interval = setInterval(() => {
+            tempScore++;
+            finalScoreDisplay.innerText = tempScore;
+            if (tempScore >= totalScore) clearInterval(interval);
+        }, 20);
+
+        // Feedback Logic
+        let title = "";
+        let msg = "";
+
+        if (totalScore >= 90) {
+            title = "太厲害了！";
+            msg = "你是國文小天才！對於課文細節和重點掌握得非常完美。";
+        } else if (totalScore >= 80) {
+            title = "表現優異！";
+            msg = "觀念非常清楚，只有幾個小陷阱沒注意到，稍微複習一下就完美了！";
+        } else if (totalScore >= 60) {
+            title = "及格通過！";
+            msg = "基本觀念都有，但對於一些細節可能比較生疏，建議多看幾次課文喔。";
+        } else {
+            title = "再接再厲！";
+            msg = "看來這些課文對你來說還有點陌生，建議搭配課本重新複習一次再來挑戰！";
+        }
+
+        document.getElementById('result-title').innerText = title;
+        resultFeedback.innerText = msg;
+    }
+
+    function restartGame() {
+        resultScreen.classList.add('hidden');
+        introScreen.classList.remove('hidden');
+        // Optional: Shuffle questions here if desired
+    }
+</script>
+
+</body>
+</html>
